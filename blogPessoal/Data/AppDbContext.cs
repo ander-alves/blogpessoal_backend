@@ -7,11 +7,13 @@ namespace blogPessoal.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Postagem>().ToTable("tb_postagem");
+            modelBuilder.Entity<Postagem>().ToTable("tb_postagens");
         }
 
         //Registra dbSet - Objeto responsavel por manupular a tabela
         public DbSet<Postagem> Postagens { get; set; } = null!;
+
+
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var insertedEntries = this.ChangeTracker.Entries()
