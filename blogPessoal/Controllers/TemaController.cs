@@ -1,5 +1,7 @@
 ﻿ using blogPessoal.Model;
 using blogPessoal.Service;
+using blogPessoal.Service.Implements;
+using blogPessoal.Validator;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -59,6 +61,26 @@ namespace blogPessoal.Controllers
             await _temaService.Create(tema);
 
             return CreatedAtAction(nameof(GetById), new { id = tema.Id }, tema);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult> Update([FromBody] Tema tema)
+        {
+            if (tema.Id == 0)
+                return BadRequest("ID da Postagem Inavalido");
+
+            var validarTema = await _temaValidator.ValidateAsync(tema);
+
+            if (!validarTema.IsValid)
+                return StatusCode(StatusCodes.Status400BadRequest, validarTema);
+
+            var resposta = await _temaService.Update(tema);
+
+            if (resposta is null)
+                return NotFound("Postagem ou Tema nao encontrados");
+
+            return Ok(resposta);
+
         }
 
 
