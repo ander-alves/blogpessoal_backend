@@ -1,11 +1,18 @@
 
+using blogpessoal.Security;
+using blogpessoal.Security.Implements;
+using blogpessoal.Service.Implements;
 using blogPessoal.Data;
 using blogPessoal.Model;
+using blogPessoal.Security;
 using blogPessoal.Service;
 using blogPessoal.Service.Implements;
 using blogPessoal.Validator;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace blogPessoal
 {
@@ -36,11 +43,38 @@ namespace blogPessoal
             //Registrar a validacao das entidades
             builder.Services.AddTransient<IValidator<Postagem>, PostagemValidator>();
             builder.Services.AddTransient<IValidator<Tema>, TemaValidator>();
+            builder.Services.AddTransient<IValidator<User>, UserValidator>();
+            
+
 
 
             //Registrar as classes de Servico
             builder.Services.AddScoped<IPostagemService, PostagemService>();
             builder.Services.AddScoped<ITemaService, TemaService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddTransient<IAuthService, AuthService>();
+
+            // Adicionar a Validação do Token JWT
+
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                var Key = Encoding.UTF8.GetBytes(Settings.Secret);
+                o.SaveToken = true;
+                o.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Key)
+                };
+            });
+
+
 
 
 
@@ -78,6 +112,11 @@ namespace blogPessoal
 
             //Inicializa o Cors
             app.UseCors("MyPolice");
+
+
+            // Habilitar a Autenticação e a Autorização
+            app.UseAuthentication();
+
 
             app.UseAuthorization();
 

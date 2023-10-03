@@ -3,11 +3,13 @@ using blogPessoal.Service;
 using blogPessoal.Service.Implements;
 using blogPessoal.Validator;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 
 namespace blogPessoal.Controllers
 {
+    [Authorize]
     [Route("~/tema")]
     [ApiController]
     public class TemaController : ControllerBase

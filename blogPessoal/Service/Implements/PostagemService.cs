@@ -18,6 +18,7 @@ namespace blogPessoal.Service.Implements
         {
             return await _context.Postagens
                 .Include(p => p.Tema)
+                .Include(p => p.Usuario)
                 .ToListAsync();
         }
 
@@ -27,6 +28,7 @@ namespace blogPessoal.Service.Implements
             {
                 var postagem = await _context.Postagens
                     .Include(p => p.Tema)
+                    .Include(p => p.Usuario)
                     .FirstAsync(i => i.Id == id);
 
                 return postagem;
@@ -41,6 +43,7 @@ namespace blogPessoal.Service.Implements
         {
             var postagem = await _context.Postagens
                 .Include(p => p.Tema)
+                .Include(p => p.Usuario)
                 .Where(p => p.Titulo
                 .Contains(titulo)).ToListAsync();
 
@@ -59,6 +62,9 @@ namespace blogPessoal.Service.Implements
                 postagem.Tema = BuscaTema;
 
             }
+            //Ternario para buscar o usuario que fez a postagem
+            postagem.Usuario = postagem.Usuario is not null ? 
+                await _context.Users.FirstOrDefaultAsync(u => u.Id == postagem.Usuario.Id) : null;
 
             await _context.Postagens.AddAsync(postagem);
             await _context.SaveChangesAsync();
@@ -68,7 +74,11 @@ namespace blogPessoal.Service.Implements
 
         public async Task<Postagem?> Update(Postagem postagem)
         {
-            var postagemUpdate = await _context.Postagens.FindAsync(postagem.Id);
+
+            var PostagemUpdate = await _context.Postagens.FindAsync(postagem.Id);
+
+            if (PostagemUpdate is null)
+                return null;
 
             if (postagem.Tema is not null)
             {
@@ -78,13 +88,17 @@ namespace blogPessoal.Service.Implements
                     return null;
 
                 postagem.Tema = BuscaTema;
+
             }
 
-            _context.Entry(postagemUpdate).State = EntityState.Detached;
+            postagem.Usuario = postagem.Usuario is not null ? await _context.Users.FirstOrDefaultAsync(u => u.Id == postagem.Usuario.Id) : null;
+
+            _context.Entry(PostagemUpdate).State = EntityState.Detached;
             _context.Entry(postagem).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return postagem;
+
         }
         public async Task Delete(Postagem postagem)
         {

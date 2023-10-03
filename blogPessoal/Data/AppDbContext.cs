@@ -5,7 +5,7 @@ namespace blogPessoal.Data
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        { 
+        {
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -14,18 +14,30 @@ namespace blogPessoal.Data
 
             modelBuilder.Entity<Tema>().ToTable("tb_tema");
 
+            modelBuilder.Entity<User>().ToTable("tb_users");
+
             // Relacionamento Postagem -> Tema
             _ = modelBuilder.Entity<Postagem>()
-         .HasOne(_ => _.Tema)
-         .WithMany(t => t.Postagem)
-         .HasForeignKey("TemaId")
-         .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(_ => _.Tema)
+                .WithMany(t => t.Postagem)
+                .HasForeignKey("TemaId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            //relacionamento postagem e usuario
+
+            _ = modelBuilder.Entity<Postagem>()
+                .HasOne(_ => _.Usuario)
+                .WithMany(u => u.Postagens)
+                .HasForeignKey("UsuarioId")
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
 
         //Registra dbSet - Objeto responsavel por manupular a tabela
         public DbSet<Postagem> Postagens { get; set; } = null!;
         public DbSet<Tema> Tema { get; set; } = null!;
+
+        public DbSet<User> Users { get; set; }
 
 
 
