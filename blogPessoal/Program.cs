@@ -1,4 +1,3 @@
-
 using blogpessoal.Configuration;
 using blogpessoal.Security;
 using blogpessoal.Security.Implements;
@@ -17,7 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 
-namespace blogPessoal
+namespace blogpessoal
 {
     public class Program
     {
@@ -25,24 +24,15 @@ namespace blogPessoal
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Add services to the container.
+
             // Add Controller Class
             builder.Services.AddControllers()
                 .AddNewtonsoftJson(options =>
-        {
-            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-        });
-
-            // Add services to the container.
-
-            builder.Services.AddControllers();
-
-
-            /* //Conexão com o banco de dados.
-             var conectionString = builder.Configuration
-                 .GetConnectionString("DefaultConnection");
-
-             builder.Services.AddDbContext<AppDbContext>(options =>
-             options.UseSqlServer(conectionString));*/
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                }
+            );
 
             // Conexão com o Banco de dados
 
@@ -73,15 +63,12 @@ namespace blogPessoal
                 );
             }
 
-            //Registrar a validacao das entidades
+            // Validação das Entidades
             builder.Services.AddTransient<IValidator<Postagem>, PostagemValidator>();
             builder.Services.AddTransient<IValidator<Tema>, TemaValidator>();
             builder.Services.AddTransient<IValidator<User>, UserValidator>();
-            
 
-
-
-            //Registrar as classes de Servico
+            // Registrar as Classes e Interfaces Service
             builder.Services.AddScoped<IPostagemService, PostagemService>();
             builder.Services.AddScoped<ITemaService, TemaService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -103,19 +90,16 @@ namespace blogPessoal
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Key)
+                    IssuerSigningKey = new SymmetricSecurityKey(Key),
                 };
             });
 
+            // Learn more about configuring Swagger/OpenAPI
+            // at https://aka.ms/aspnetcore/swashbuckle
 
-
-
-
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-           
-            
-            //Registrar o Swagger (colado do cookbook)
+
+            //Registrar o Swagger
             builder.Services.AddSwaggerGen(options =>
             {
 
@@ -127,14 +111,14 @@ namespace blogPessoal
                     Description = "Projeto Blog Pessoal - ASP.NET Core 7 - Entity Framework",
                     Contact = new OpenApiContact
                     {
-                        Name = "Anderson Alves",
-                        Email = "alves_anderson@outlook.com",
-                        Url = new Uri("https://github.com/ander-alves")
+                        Name = "Generation Brasil",
+                        Email = "conteudogeneration@generation.org",
+                        Url = new Uri("https://github.com/conteudoGeneration")
                     },
                     License = new OpenApiLicense
                     {
                         Name = "Github",
-                        Url = new Uri("https://github.com/ander-alves")
+                        Url = new Uri("https://github.com/conteudoGeneration")
                     }
                 });
 
@@ -157,58 +141,63 @@ namespace blogPessoal
             // Adicionar o Fluent Validation no Swagger
             builder.Services.AddFluentValidationRulesToSwagger();
 
-            //Configuracao do CORS
+
+            // Configuração do CORS
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy(name: "MyPolicy",
                     policy =>
                     {
                         policy.AllowAnyOrigin()
-                              .AllowAnyMethod()
-                              .AllowAnyHeader();
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
                     });
             });
 
             var app = builder.Build();
 
-            //Criar config necessaria para Gerar o Banco
+            // Criar o Banco de dados e as tabelas Automaticamente
             using (var scope = app.Services.CreateAsyncScope())
             {
-                var dbContect = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                dbContect.Database.EnsureCreated();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.Database.EnsureCreated();
+
             }
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            app.UseDeveloperExceptionPage();
+
+            // Habilitar o Swagger
+            app.UseSwagger();
+
+            app.UseSwaggerUI();
+
+            // Swagger como Página Inicial (Home) na Nuvem
+            if (app.Environment.IsProduction())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-
-                // Swagger como Página Inicial (Home) na Nuvem
-                if (app.Environment.IsProduction())
+                app.UseSwaggerUI(c =>
                 {
-                    app.UseSwaggerUI(c =>
-                    {
-                        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blog Pessoal - V1");
-                        c.RoutePrefix = string.Empty;
-                    });
-                }
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blog Pessoal - V1");
+                    c.RoutePrefix = string.Empty;
+                });
             }
 
-            //Inicializa o Cors
-            app.UseCors("MyPolice");
+            //Habilitar CORS
 
+            app.UseCors("MyPolicy");
 
             // Habilitar a Autenticação e a Autorização
-            app.UseAuthentication();
 
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
-
+            // Habilitar Controller
             app.MapControllers();
 
             app.Run();
         }
     }
 }
+
+// Cria uma Classe Parcial para executar os Testes no xUnit
+public partial class Program { }
