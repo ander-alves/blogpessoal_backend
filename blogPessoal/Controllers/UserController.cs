@@ -30,12 +30,14 @@ namespace blogpessoal.Controllers
 
         }
 
+        [Authorize]
         [HttpGet("all")]
         public async Task<ActionResult> GetAll()
         {
             return Ok(await _userService.GetAll());
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult> GetById(long id)
         {
@@ -49,6 +51,7 @@ namespace blogpessoal.Controllers
             return Ok(Resposta);
         }
 
+        [AllowAnonymous]
         [HttpPost("cadastrar")]
         public async Task<ActionResult> Create([FromBody] User usuario)
         {
@@ -65,6 +68,7 @@ namespace blogpessoal.Controllers
             return CreatedAtAction(nameof(GetById), new { id = Resposta.Id }, Resposta);
         }
 
+        [Authorize]
         [HttpPut("atualizar")]
         public async Task<ActionResult> Update([FromBody] User usuario)
         {
