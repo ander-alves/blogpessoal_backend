@@ -69,20 +69,19 @@ namespace blogPessoal.Controllers
         public async Task<ActionResult> Update([FromBody] Tema tema)
         {
             if (tema.Id == 0)
-                return BadRequest("ID da Postagem Inavalido");
+                return BadRequest("O Id do Tema é inválido!");
 
             var validarTema = await _temaValidator.ValidateAsync(tema);
 
             if (!validarTema.IsValid)
                 return StatusCode(StatusCodes.Status400BadRequest, validarTema);
 
-            var resposta = await _temaService.Update(tema);
+            var Resposta = await _temaService.Update(tema);
 
-            if (resposta is null)
-                return NotFound("Postagem ou Tema nao encontrados");
+            if (Resposta is null)
+                return NotFound("Tema não encontrado!");
 
-            return Ok(resposta);
-
+            return Ok(Resposta);
         }
 
 
