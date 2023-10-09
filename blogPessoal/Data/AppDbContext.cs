@@ -35,7 +35,7 @@ namespace blogPessoal.Data
 
         //Registra dbSet - Objeto responsavel por manupular a tabela
         public DbSet<Postagem> Postagens { get; set; } = null!;
-        public DbSet<Tema> Tema { get; set; } = null!;
+        public DbSet<Tema> Temas { get; set; } = null!;
 
         public DbSet<User> Users { get; set; }
 

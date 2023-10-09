@@ -7,7 +7,7 @@ using Microsoft.Identity.Client;
 
 namespace blogPessoal.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("~/postagens")]
     [ApiController]
     public class PostagemController : ControllerBase

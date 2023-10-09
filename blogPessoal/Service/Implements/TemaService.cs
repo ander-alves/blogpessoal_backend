@@ -16,7 +16,7 @@ namespace blogPessoal.Service.Implements
 
         public async Task<IEnumerable<Tema>> GetAll()
         {
-            return await _context.Tema
+            return await _context.Temas
                 .Include(t => t.Postagem) // Incluindo lista das postagens           
                 .ToListAsync();
         }
@@ -25,7 +25,7 @@ namespace blogPessoal.Service.Implements
         {
             try
             {
-                var tema = await _context.Tema
+                var tema = await _context.Temas
                   .Include(t => t.Postagem)
                   .FirstAsync(i => i.Id == id);
 
@@ -39,7 +39,7 @@ namespace blogPessoal.Service.Implements
 
         public async Task<IEnumerable<Tema>> GetByDescricao(string descricao)
         {
-            var tema = await _context.Tema
+            var tema = await _context.Temas
                 .Include(t => t.Postagem)
                 .Where(p => p.Descricao.Contains(descricao))
                 .ToListAsync();
@@ -49,7 +49,7 @@ namespace blogPessoal.Service.Implements
 
         public async Task<Tema?> Create(Tema tema)
         {
-            await _context.Tema.AddAsync(tema);
+            await _context.Temas.AddAsync(tema);
             await _context.SaveChangesAsync();
 
             return tema;
@@ -58,13 +58,13 @@ namespace blogPessoal.Service.Implements
 
         public async Task<Tema?> Update(Tema tema)
         {
-            var temaUpdate = await _context.Postagens.FindAsync(tema.Id);
 
-            if (temaUpdate is null)
-            {
+            var TemaUpdate = await _context.Temas.FindAsync(tema.Id);
+
+            if (TemaUpdate == null)
                 return null;
-            }
-            _context.Entry(temaUpdate).State = EntityState.Detached;
+
+            _context.Entry(TemaUpdate).State = EntityState.Detached;
             _context.Entry(tema).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
@@ -72,7 +72,7 @@ namespace blogPessoal.Service.Implements
         }
         public async Task Delete(Tema tema)
         {
-            _context.Tema.Remove(tema);
+            _context.Temas.Remove(tema);
             await _context.SaveChangesAsync();
         }
 

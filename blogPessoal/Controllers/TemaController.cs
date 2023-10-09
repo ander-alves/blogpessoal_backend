@@ -9,7 +9,7 @@ using Microsoft.Identity.Client;
 
 namespace blogPessoal.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("~/tema")]
     [ApiController]
     public class TemaController : ControllerBase

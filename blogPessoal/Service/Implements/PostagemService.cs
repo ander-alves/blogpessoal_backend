@@ -54,7 +54,7 @@ namespace blogPessoal.Service.Implements
         {
             if (postagem.Tema is not null)
             {
-                var BuscaTema = await _context.Tema.FindAsync(postagem.Tema.Id);
+                var BuscaTema = await _context.Temas.FindAsync(postagem.Tema.Id);
 
                 if (BuscaTema is null)
                     return null;
@@ -82,7 +82,7 @@ namespace blogPessoal.Service.Implements
 
             if (postagem.Tema is not null)
             {
-                var BuscaTema = await _context.Tema.FindAsync(postagem.Tema.Id);
+                var BuscaTema = await _context.Temas.FindAsync(postagem.Tema.Id);
 
                 if (BuscaTema is null)
                     return null;
