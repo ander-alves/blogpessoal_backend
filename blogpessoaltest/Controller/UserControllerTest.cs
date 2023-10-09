@@ -4,6 +4,7 @@ using FluentAssertions;
 using Newtonsoft.Json;
 using System.Dynamic;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using Xunit.Extensions.Ordering;
@@ -38,8 +39,8 @@ namespace blogpessoaltest.Controllers
         {
             var novoUsuario = new Dictionary<string, string>
             {
-                { "nome", "João" },
-                { "usuario", "joao12@email.com.br" },
+                { "nome", "Ingrid" },
+                { "usuario", "ingrid@email.com.br" },
                 { "senha", "12345678" },
                 { "foto", "-" }
             };
@@ -136,6 +137,31 @@ namespace blogpessoaltest.Controllers
 
             resposta.StatusCode.Should().Be(HttpStatusCode.OK);
 
+        }
+        [Fact, Order(5)]
+        public async Task DeveListarUmUsuario()
+        {
+            _client.SetFakeBearerToken((object)token);
+
+            var resposta = await _client.GetAsync("usuarios/1");
+            resposta.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Fact, Order(6)]
+        public async Task DeveAutenticarUmUsuario()
+        {
+            var novoUsuario = new Dictionary<string, string>()
+   {
+      {"usuario", "ingrid@email.com.br" },
+      {"senha", "12345678" },
+   };
+
+            var usuarioJson = JsonConvert.SerializeObject(novoUsuario);
+            var corpoRequisicao = new StringContent(usuarioJson, Encoding.UTF8, "application/json");
+
+            var resposta = await _client.PostAsync("/usuarios/logar", corpoRequisicao);
+
+            resposta.StatusCode.Should().Be(HttpStatusCode.OK);
         }
     }
 }
